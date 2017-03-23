@@ -39,7 +39,18 @@ public class ServerThread extends Thread {
 
     public void run() {
         public void run() {
+            //ui.jTextArea1.append("\nServer thread: " + id + " berjalan.");
 
+            while(true) {
+                try {
+                    Message msg = (Message) streamIn.readObject();
+                    server.handle(id, msg);
+                }catch(Exception e) {
+                    System.out.println(id + " error saat membaca " + e.getMessage());
+                    server.remove(id);
+                    stop();
+                }
+            }
         }
     }
 }
