@@ -9,7 +9,7 @@
         <module name="chat-academia-edu-server" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8">
       <module name="chat-academia-edu-server" target="1.5" />
     </bytecodeTargetLevel>
   </component>
