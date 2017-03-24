@@ -10,11 +10,14 @@ import java.net.Socket;
  */
 public class ServerThread extends Thread {
 
+
     public SocketServer server = null;
     public Socket socket = null;
     public int id = -1;
+    public String username = "";
     public ObjectOutputStream streamOut = null;
     public ObjectInputStream streamIn = null;
+    public ServerFrame ui;
 
     public ServerThread(SocketServer server, Socket socket) {
         super();
@@ -33,24 +36,34 @@ public class ServerThread extends Thread {
         }
     }
 
-    public int getID() {
+    public int getId() {
         return id;
     }
 
     public void run() {
-        public void run() {
-            //ui.jTextArea1.append("\nServer thread: " + id + " berjalan.");
+        //ui.jTextArea1.append("\nServer thread: " + id + " berjalan.");
 
-            while(true) {
-                try {
-                    Message msg = (Message) streamIn.readObject();
-                    server.handle(id, msg);
-                }catch(Exception e) {
-                    System.out.println(id + " error saat membaca " + e.getMessage());
-                    server.remove(id);
-                    stop();
-                }
+        while(true) {
+            try {
+                Message msg = (Message) streamIn.readObject();
+                server.handle(id, msg);
+            }catch(Exception e) {
+                System.out.println(id + " error saat membaca " + e.getMessage());
+                server.remove(id);
+                stop();
             }
         }
+    }
+
+    public void open() throws IOException {
+        streamOut = new ObjectOutputStream(socket.getOutputStream());
+        streamOut.flush();
+        streamIn = new ObjectInputStream(socket.getInputStream());
+    }
+
+    public void close() throws IOException {
+        if(socket != null) socket.close();
+        if(streamIn != null) streamIn.close();
+        if(streamOut != null) streamOut.close();
     }
 }
