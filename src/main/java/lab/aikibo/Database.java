@@ -57,7 +57,7 @@ public class Database {
 
     private String getTagValue(String username, Element eElement) {
         //eElement.ElementsByTagName(username);
-        //return null;
+        return null;
     }
 
     public boolean checkLogin(String username, String password) {
