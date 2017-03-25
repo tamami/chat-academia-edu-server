@@ -11,7 +11,8 @@ import java.net.Socket;
 public class SocketServer implements Runnable {
 
     public ServerSocket server = null;
-    public int port = 8080;
+    public Thread thread = null;
+    public int port = 8086;
     public ServerFrame ui;
     public ServerThread clients[];
     public Database db;
@@ -31,11 +32,15 @@ public class SocketServer implements Runnable {
             port = server.getLocalPort();
             //ui.jTextArea1.append("Server starter. IP : " + InetAddress.getLocalHost() + ", Port : " +
             //        server.getLocalPort());
+            ui.getTaInfo().appendText("Server starter. IP : " + InetAddress.getLocalHost() + ", Port : " +
+                        server.getLocalPort());
             start();
         } catch (IOException e) {
             e.printStackTrace();
             //ui.jTextArea1.append("cannot bind to port : " + port + "\nRetrying");
             //ui.retryStart(0);
+            ui.getTaInfo().appendText("cannot bind to port : " + port + "\nRetrying");
+            ui.retryStart(0);
         }
     }
 
@@ -43,10 +48,13 @@ public class SocketServer implements Runnable {
         while(thread != null) {
             try {
                 //ui.jTextArea1.append("\nWaiting for client...");
+                ui.getTaInfo().appendText("\nWaiting for client...");
                 addThread(server.accept());
             } catch(Exception e) {
                 //ui.jTextArea1.append("\nServer accept error: \n");
                 //ui.retryStart(0);
+                ui.getTaInfo().appendText("\nServer accept error: \n");
+                ui.retryStart(0);
             }
         }
     }
@@ -100,7 +108,7 @@ public class SocketServer implements Runnable {
                 }
             } else if(msg.type.equals("message")) {
                 if(msg.recipient.equals("All")) {
-                    announce("message" msg.sender, msg.content);
+                    announce("message", msg.sender, msg.content);
                 } else {
                     findUserThread(msg.recipient).send(new Message(
                             msg.type, msg.sender, msg.content, msg.recipient
@@ -210,6 +218,17 @@ public class SocketServer implements Runnable {
     private void addThread(Socket socket) {
         if(clientCount <  clients.length) {
             //ui.jTextArea1.append("\nclient accepted: " + socket);
+            clients[clientCount] = new ServerThread(this, socket);
+            try {
+                clients[clientCount].open();
+                clients[clientCount].start();
+                clientCount++;
+            } catch (IOException e) {
+                e.printStackTrace();
+                //ui.jTextArea1.append("\nError opening thread : " + e);
+            }
+        } else {
+            //ui.jTextArea1.append("\nclient refused: maximum " + clients.length + " reached.");
         }
     }
 }

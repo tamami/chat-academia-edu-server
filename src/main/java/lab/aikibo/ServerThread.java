@@ -36,7 +36,7 @@ public class ServerThread extends Thread {
         }
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
